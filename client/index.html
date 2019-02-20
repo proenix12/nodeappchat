@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" type="text/css" href="/stylesheets/style.css">
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+</head>
+<body>
+
+<div class="chat-container">
+    <div id="chatroom">
+        <div id="feedback"></div>
+    </div>
+
+    <form id="textarea" action="" method="POST">
+        <div>
+            <textarea name="text_editor" id="text"></textarea>
+        </div>
+        <div>
+            <button type="submit">Submit</button>
+        </div>
+    </form>
+</div>
+
+<script>
+    $(function () {
+        let socket = io('http://localhost:3000');
+        let chatroom = $('#chatroom');
+        let feedback = $('#feedback');
+        let timeout;
+
+        socket.on('userData', (data)=>{
+            console.log(data);
+        })
+
+
+        $('#textarea').submit((e) => {
+            e.preventDefault();
+            let message = $('#text');
+
+            socket.emit('new_message', { message: message.val() });
+            message.val('');
+        });
+
+        socket.on('new_message', (data) => {
+            chatroom.append("<p class='message'>" + data.username + ": " + data.message + "</p>");
+            var objDiv = document.getElementById("chatroom");
+            objDiv.scrollTop = objDiv.scrollHeight;
+        })
+
+        function timeoutFunction() {
+            typing = false;
+            socket.emit("typing", false);
+        }
+
+        $('#text').keyup(function() {
+            console.log('happening');
+            typing = true;
+            socket.emit('typing', typing);
+            clearTimeout(timeout);
+            timeout = setTimeout(timeoutFunction, 2000);
+        });
+
+        socket.on('typing', (data) => {
+            console.log(data);
+            if (data.typing ===  true) {
+                feedback.html('<p class="typing"><i>' + data.username + ' is typing a message....' + '</i></p>');
+            } else {
+                feedback.html('');
+            }
+        })
+
+    });
+</script>
+
+</body>
+</html>
