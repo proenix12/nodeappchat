@@ -100,7 +100,8 @@ $(function () {
         });
     });
 
-    $('#roombutton').click(function(){
+    $('.modal-content').submit(function(e){
+        e.preventDefault();
         var name = $('#roomname').val();
         $('#roomname').val('');
         $('.modal').css('display', 'none');

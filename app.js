@@ -80,7 +80,7 @@ io.on('connection', function(socket){
 
     socket.on('typing', (data) => {
         //socket.broadcast.emit('typing', {username:socket.username, typing:data});
-        socket.broadcast.to(socket.room).emit('typing', {username:socket.username, typing:data});
+        socket.broadcast.to(socket.room).emit('typing', { username:socket.username, typing:data });
     });
 
     //Disconnect
